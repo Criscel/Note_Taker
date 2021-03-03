@@ -23,29 +23,27 @@ app.get("/notes", function (req, res) {
 
  //to get notes then send it to db.json
  app.get('/api/notes', (req, res) => res.json(JSON.parse(fs.readFileSync('db/db.json'))));
-      console.log(res);
+      //console.log(res);
 
 //add new notes
-app.post("/api/notes", (req, res) => {
-    fs.readFile(__dirname, '/db/db.json', function (err,notes) {
-        if (err) throw err;
+  app.post("/api/notes", function (req, res) {
+    fs.readFile(__dirname + "/db/db.json", function (err, notes) {
+      if (err) throw err
 
-        notes = JSON.parse(notes)
+      notes = JSON.parse(notes)
+  
+      var id = notes[notes.length - 1].id + 1
+      var newNote = { title: req.body.title, text: req.body.text, id: id }
+      var activeNote = notes.concat(newNote)
+  
+      fs.writeFile(__dirname + "/db/db.json", JSON.stringify(activeNote), function (err, data) {
+        if (err) throw err
 
-        var id = notes[notes.length - 1].id + 1
-        var newNote = { title: req.body.title, text: req.body.text, id: id }
-        var activeNote = notes.concat(newNote)
-
-        fs.writeFile(__dirname + "/db/db.json", JSON.stringify(activeNote), function (error, data) {
-            if (error) {
-              return error
-            }
         console.log(activeNote)
         res.json(activeNote);
       })
-    });
-  });
-
+    })
+  })
 
 //delete notes (BONUS)
  app.delete("api/database", (req, res) => {
