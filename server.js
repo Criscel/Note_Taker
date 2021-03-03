@@ -22,7 +22,9 @@ app.get("/notes", function (req, res) {
 });
 
  //to get notes then send it to db.json
- app.get('/api/notes', (req, res) => res.json(JSON.parse(fs.readFileSync('db/db.json'))));
+ app.get('/api/notes', function (req, res) { 
+   res.json(JSON.parse(fs.readFileSync('db/db.json')))
+ });
       //console.log(res);
 
 //add new notes
@@ -39,19 +41,52 @@ app.get("/notes", function (req, res) {
       fs.writeFile(__dirname + "/db/db.json", JSON.stringify(activeNote), function (err, data) {
         if (err) throw err
 
-        console.log(activeNote)
+        //console.log(activeNote)
         res.json(activeNote);
       })
     })
   })
 
 //delete notes (BONUS)
- app.delete("api/database", (req, res) => {
-   var delNote = JSON.parse(req.params.id);
-   console.log(delNote);
-});
- 
+app.delete("/api/notes/:id", function (req, res) {
+  const noteId = JSON.parse(req.params.id)
+  console.log(noteId)
+  fs.readFile(__dirname + "/db/db.json", function (err, notes) {
+    if (err) throw err
 
+    notes = JSON.parse(notes)
+
+    notes = notes.filter(val => val.id !== noteId)
+
+    fs.writeFile(__dirname + "/db/db.json", JSON.stringify(notes), function (err, data) {
+      if (err) throw err
+
+      res.json(notes)
+    })
+  })
+})
+
+app.put("/api/notes/:id", function(req, res) {
+  const noteId = JSON.parse(req.params.id)
+  console.log(noteId)
+  fs.readFile(__dirname + "db/db.json", function(error, notes) {
+    if (error ){
+      return console.log(error)
+    }
+    notes.JSONparse(notes)
+
+    notes = notes.filter(val => val.id !== noteId)
+
+    fs.writeFile(__dirname +"db/db.json", JSON.stringify(notes), function (error, data) {
+      if (error) {
+        return error
+      }
+      res.json(notes)
+    })
+  })
+}) 
+
+// Starts the server to begin listening
 app.listen(PORT, function() {
     console.log(`Server listening on: http://localhost:${PORT}`);
   });
